@@ -28,7 +28,13 @@ app.use(bodyParser.json());
 //kjo perdoret me lidh front-end me back-end
 app.use(cors());
 
-app.get('/', (req, res) => {res.send(database.users)})
+
+//kjo esht per ne kompjuter
+//app.get('/', (req, res) => {res.send(database.users)})
+
+
+//per heroku 
+app.get('/', (req, res) => {res.send('it is working')})
 //kjo esht per sigin
 app.post('/signin',  signin.handleSignin(db, bcrypt)) //metode e avancuar. i mer direkt request dhe response
 //kjo esht per register
