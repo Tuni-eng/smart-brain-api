@@ -13,9 +13,9 @@ const image = require('./controllers/image');
 const db = knex({  //kte e kthejm ne function
 	client: 'pg', //e lifhim me postgresin
     connection: {
-	    host : '127.0.0.1',// trregojm se ku esh databse ne platforem host. esht si shpi locactioni
+	    host : 'postgresql-concave-68748',// trregojm se ku esh databse ne platforem host. esht si shpi locactioni
 	    user : 'posgres',
-	    password : '123',
+	    password : '',
 	    database : 'smart-brain'
   }
 });
