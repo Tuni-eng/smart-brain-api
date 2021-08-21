@@ -13,10 +13,12 @@ const image = require('./controllers/image');
 const db = knex({  //kte e kthejm ne function
 	client: 'pg', //e lifhim me postgresin
     connection: {
-	    host : 'postgresql-concave-68748',// trregojm se ku esh databse ne platforem host. esht si shpi locactioni
-	    user : 'posgres',
-	    password : '',
-	    database : 'smart-brain'
+	    host : 'process.env.DATABASE_URL',// trregojm se ku esh databse ne platforem host. esht si shpi locactioni
+	    ssl: true,
+	    //kjo posht esht per serverin ne kompjuter
+	    // user : 'posgres',
+	    // password : '',
+	    // database : 'smart-brain'
   }
 });
  
