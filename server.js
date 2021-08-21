@@ -13,7 +13,7 @@ const image = require('./controllers/image');
 const db = knex({  //kte e kthejm ne function
 	client: 'pg', //e lifhim me postgresin
     connection: {
-	    host : 'process.env.DATABASE_URL',// trregojm se ku esh databse ne platforem host. esht si shpi locactioni
+	    connectionString : 'process.env.DATABASE_URL',// trregojm se ku esh databse ne platforem host. esht si shpi locactioni
 	    ssl: true,
 	    //kjo posht esht per serverin ne kompjuter
 	    // user : 'posgres',
