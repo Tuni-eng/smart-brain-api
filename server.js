@@ -2,23 +2,31 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
-const knex = require('knex')
+const knex = require('knex');
 
-const db = knex({
-  // Enter your own database information here based on what you created
-  client: 'pg',
-  connection: {
-    host : '127.0.0.1',
-    user : 'redi',
-    password : '',
-    database : 'smart-brain'
+//dhe kto jan importe por nga filet q kemi kriju
+const register = require('./controllers/register'); // kjo brenda kllapave quhet path
+const signin = require('./controllers/signin');
+const profile = require('./controllers/profile');
+const image = require('./controllers/image');
+
+const db = knex({  //kte e kthejm ne function
+	client: 'pg', //e lifhim me postgresin
+    connection: {
+	    host : '127.0.0.1',// trregojm se ku esh databse ne platforem host. esht si shpi locactioni
+	    user : 'posgres',
+	    password : '123',
+	    database : 'smart-brain'
   }
 });
-
+ 
 const app = express();
 
-app.use(cors())
-app.use(bodyParser.json());
+
+// kjo esht midleware dhe bohert me aktivizu bodyparse
+app.use(bodyParser.json()); 
+//kjo perdoret me lidh front-end me back-end
+app.use(cors());
 
 
 //kjo esht per ne kompjuter
@@ -28,76 +36,15 @@ app.use(bodyParser.json());
 //per heroku 
 app.get('/', (req, res) => {res.send('it is working')})
 //kjo esht per sigin
-app.post('/signin', (req, res) => {
-  db.select('email', 'hash').from('login')
-    .where('email', '=', req.body.email)
-    .then(data => {
-      const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
-      if (isValid) {
-        return db.select('*').from('users')
-          .where('email', '=', req.body.email)
-          .then(user => {
-            res.json(user[0])
-          })
-          .catch(err => res.status(400).json('unable to get user'))
-      } else {
-        res.status(400).json('wrong credentials')
-      }
-    })
-    .catch(err => res.status(400).json('wrong credentials'))
-})
+app.post('/signin',  signin.handleSignin(db, bcrypt)) //metode e avancuar. i mer direkt request dhe response
+//kjo esht per register
+app.post('/register', (req, res) => {register.handleRegister(req, res, db, bcrypt)}) //kto mrena kllapes bohen qe te njefen ne register.js
+// kjo esht per users. del lart id personale per cdo user
+app.get('/profile/:id', (req, res) => {profile.handleProfileGet(req, res, db)})
+// image qe sa her fut foto te shenohet tek entries
+app.put('/image', (req, res) => {image.handleImage(req, res, db)})
+app.post('/imageurl', (req, res) => {image.handleApiCall(req, res)})
 
-app.post('/register', (req, res) => {
-  const { email, name, password } = req.body;
-  const hash = bcrypt.hashSync(password);
-    db.transaction(trx => {
-      trx.insert({
-        hash: hash,
-        email: email
-      })
-      .into('login')
-      .returning('email')
-      .then(loginEmail => {
-        return trx('users')
-          .returning('*')
-          .insert({
-            email: loginEmail[0],
-            name: name,
-            joined: new Date()
-          })
-          .then(user => {
-            res.json(user[0]);
-          })
-      })
-      .then(trx.commit)
-      .catch(trx.rollback)
-    })
-    .catch(err => res.status(400).json('unable to register'))
-})
-
-app.get('/profile/:id', (req, res) => {
-  const { id } = req.params;
-  db.select('*').from('users').where({id})
-    .then(user => {
-      if (user.length) {
-        res.json(user[0])
-      } else {
-        res.status(400).json('Not found')
-      }
-    })
-    .catch(err => res.status(400).json('error getting user'))
-})
-
-app.put('/image', (req, res) => {
-  const { id } = req.body;
-  db('users').where('id', '=', id)
-  .increment('entries', 1)
-  .returning('entries')
-  .then(entries => {
-    res.json(entries[0]);
-  })
-  .catch(err => res.status(400).json('unable to get entries'))
-})
 //kjo bohet per herokun 
 app.listen(process.env.PORT || 3000, ()=> { 
 	console.log(`app is running on port ${process.env.PORT}`);
