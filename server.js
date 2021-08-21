@@ -40,12 +40,16 @@ app.put('/image', (req, res) => {image.handleImage(req, res, db)})
 app.post('/imageurl', (req, res) => {image.handleApiCall(req, res)})
 
 
-
-
-
-app.listen(3000, ()=> { //kjo trregon se ne cfare porte do hapet ne cfar hosti
-	console.log('app is running on port 3000');
+app.listen(process.env.PORT || 3000, ()=> { //kjo trregon se ne cfare porte do hapet ne cfar hosti
+	console.log(`app is running on port ${process.env.PORT}`);
 })
+
+
+
+//kjo esh per kur e kemi ne lepatop jo online
+// app.listen(3000, ()=> { //kjo trregon se ne cfare porte do hapet ne cfar hosti
+// 	console.log('app is running on port 3000');
+// })
 
 /* menyra se si do i rradhisim 
 / --> res = this is working
